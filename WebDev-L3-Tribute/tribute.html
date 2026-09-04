@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tribute · Ada Lovelace</title>
+    <!-- fonts: serif for headings, sans for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
+    <style>
+        /* base & reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f7f3ee;
+            color: #1c1c1c;
+            line-height: 1.6;
+        }
+
+        .tribute-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ----- section backgrounds (2+ colours) ----- */
+        .section-hero {
+            background: #1f2a3a;        /* dark slate */
+            color: #f0f2f5;
+            border-radius: 2.5rem 2.5rem 0 0;
+            padding: 2.5rem 2rem 2rem;
+            margin-bottom: 0;
+        }
+
+        .section-bio {
+            background: #ffffff;        /* white */
+            padding: 2.5rem 2rem;
+            margin-top: 0;
+            border-radius: 0;
+        }
+
+        .section-timeline {
+            background: #e7e3dc;        /* warm light grey */
+            padding: 2.5rem 2rem;
+            border-radius: 0;
+        }
+
+        .section-quote {
+            background: #2b3a4a;        /* deep blue-grey */
+            color: #f0f3f7;
+            padding: 2.8rem 2rem;
+            border-radius: 0 0 2.5rem 2.5rem;
+            margin-bottom: 0;
+        }
+
+        /* ----- typography: 2 font styles ----- */
+        h1, h2, h3 {
+            font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            line-height: 1.15;
+            margin-bottom: 0.2rem;
+        }
+
+        .tagline {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            color: #bbc9db;
+            border-left: 3px solid #8aa3c9;
+            padding-left: 1rem;
+            margin-top: 0.2rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 3px solid rgba(0,0,0,0.08);
+            padding-bottom: 0.3rem;
+            display: inline-block;
+        }
+
+        .section-timeline h2 {
+            border-bottom-color: #b3a693;
+        }
+
+        .section-quote h2 {
+            border-bottom-color: #6b859e;
+        }
+
+        /* ----- hero / image ----- */
+        .hero-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.5rem;
+            align-items: center;
+            margin-top: 0.8rem;
+        }
+
+        .hero-text {
+            flex: 1 1 280px;
+        }
+
+        .hero-image {
+            flex: 1 1 240px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            border-radius: 2rem;
+            box-shadow: 0 16px 30px -8px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: 0.2s;
+            filter: brightness(0.95);
+        }
+
+        .hero-image img:hover {
+            transform: scale(1.01);
+            filter: brightness(1);
+        }
+
+        /* biography paragraphs */
+        .bio-content {
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .bio-content p {
+            margin-bottom: 1.2rem;
+            font-size: 1.08rem;
+            color: #1e2a33;
+        }
+
+        .bio-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bio-content strong {
+            color: #1f3c57;
+            font-weight: 600;
+        }
+
+        /* timeline cards */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .timeline-card {
+            background: #fcfaf7;
+            padding: 1.4rem 1rem 1.2rem;
+            border-radius: 1.8rem;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: 0.15s;
+            text-align: center;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-4px);
+            background: #ffffff;
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.08);
+        }
+
+        .timeline-year {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #1f3c57;
+            letter-spacing: -0.5px;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-card p {
+            font-size: 0.98rem;
+            color: #2c3f4f;
+            font-weight: 400;
+        }
+
+        /*  quote block */
+        .quote-block {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 0.8rem 0 0.2rem;
+        }
+
+        .quote-block blockquote {
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            font-style: italic;
+            font-size: 1.8rem;
+            line-height: 1.4;
+            color: #edf2fa;
+            quotes: "“" "”" "‘" "’";
+            padding-left: 1.2rem;
+            border-left: 6px solid #a3bedb;
+            margin-bottom: 0.8rem;
+        }
+
+        .quote-block blockquote::before {
+            content: "“";
+            font-size: 2.8rem;
+            color: #b3cee9;
+            margin-right: 0.1rem;
+            opacity: 0.7;
+        }
+
+        .quote-author {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 1.1rem;
+            color: #c3d4e5;
+            text-align: right;
+            margin-top: 0.2rem;
+        }
+
+        .quote-author::before {
+            content: "— ";
+        }
+
+        /* ----- responsive ----- */
+        @media (max-width: 700px) {
+            .section-hero {
+                padding: 1.8rem 1.2rem;
+            }
+            .section-bio, .section-timeline, .section-quote {
+                padding: 2rem 1.2rem;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .tagline {
+                font-size: 1.1rem;
+            }
+            .hero-grid {
+                gap: 1.5rem;
+            }
+            .hero-image img {
+                max-width: 240px;
+            }
+            .quote-block blockquote {
+                font-size: 1.4rem;
+                padding-left: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.1rem;
+            }
+            .timeline-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.8rem;
+            }
+            .timeline-card {
+                padding: 1rem 0.5rem;
+            }
+            .timeline-year {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* small extra touches */
+        .attribution {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 1.8rem;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 1rem;
+            color: #cbdae6;
+        }
+
+        .attribution a {
+            color: #d1e2f5;
+            text-decoration: none;
+        }
+
+        .attribution a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="tribute-wrapper">
+
+        <!-- HERO section (background colour 1) -->
+        <section class="section-hero">
+            <h1>Ada Lovelace</h1>
+            <div class="tagline">visionary · mathematician · first computer programmer</div>
+
+            <div class="hero-grid">
+                <div class="hero-text">
+                    <p style="font-size: 1.15rem; font-weight: 300; opacity: 0.9; margin-bottom: 0.4rem;">
+                        <span style="font-family: 'Playfair Display', serif; font-weight: 500; font-size: 1.4rem;">“</span>
+                        That brain of mine is something more than merely mortal, as time will show.
+                        <span style="font-family: 'Playfair Display', serif; font-weight: 500; font-size: 1.4rem;">”</span>
+                    </p>
+                    <p style="font-size: 0.95rem; opacity: 0.7; margin-top: 0.5rem;">
+                        Augusta Ada King, Countess of Lovelace · 1815 – 1852
+                    </p>
+                </div>
+                <div class="hero-image">
+                    <!-- image from Wikimedia Commons (public domain) -->
+                    <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Ada_Byron_daguerreotype_by_Antoine_Claudet_1843_or_1850_-_cropped.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" 
+                        alt="Portrait of Ada Lovelace, watercolour painting" 
+                        loading="lazy"
+                    />
+                </div>
+            </div>
+        </section>
+
+        <!-- BIOGRAPHY section (background colour 2: white) -->
+        <section class="section-bio">
+            <div class="bio-content">
+                <h2>Biography</h2>
+                <p>
+                    <strong>Ada Lovelace</strong> (1815–1852) was an English mathematician and writer, 
+                    known primarily for her work on Charles Babbage’s proposed mechanical general-purpose 
+                    computer, the Analytical Engine. She was the only legitimate child of the poet Lord Byron 
+                    and his wife, Anne Isabella Milbanke. Her mother, a mathematician herself, ensured Ada 
+                    received a rigorous education in science and mathematics — a rare path for women of her era.
+                </p>
+                <p>
+                    At the age of 17, Ada was introduced to the scientific elite of London, and through her 
+                    mentor, Mary Somerville, she met Charles Babbage. Their correspondence blossomed into a 
+                    productive collaboration. Babbage was impressed by her intellect, and she became fascinated 
+                    with his Difference Engine and later the Analytical Engine.
+                </p>
+                <p>
+                    In 1842–43, Ada translated an Italian article on the Analytical Engine and added extensive 
+                    notes of her own — three times the length of the original. In these notes, she described an 
+                    algorithm for the Engine to compute Bernoulli numbers, which is widely recognised as the 
+                    first published computer program. She also foresaw that machines could go beyond mere number 
+                    crunching, envisioning a future where they might compose music, create graphics, and even 
+                    serve as an extension of human intellect.
+                </p>
+                <p>
+                    Though her work was largely overlooked for a century, Lovelace is now celebrated as a 
+                    pioneer in computing and a symbol of women in STEM. Her foresight and analytical brilliance 
+                    continue to inspire technologists, mathematicians, and dreamers around the world.
+                </p>
+            </div>
+        </section>
+
+        <!-- TIMELINE section (background colour 3) -->
+        <section class="section-timeline">
+            <h2>Key achievements</h2>
+            <div class="timeline-grid">
+                <div class="timeline-card">
+                    <span class="timeline-year">1833</span>
+                    <p>Meets Charles Babbage and becomes captivated by his Difference Engine.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-year">1835</span>
+                    <p>Marries William King, later becoming Countess of Lovelace.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-year">1842–43</span>
+                    <p>Publishes her celebrated <em>Notes</em> on the Analytical Engine, including the first algorithm.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-year">1844</span>
+                    <p>Corresponds with Babbage about using the Engine for symbolic logic and music composition.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-year">1980</span>
+                    <p>U.S. Department of Defense names the programming language <strong>Ada</strong> in her honour.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-year">2015</span>
+                    <p>Global celebrations mark the bicentenary of her birth, reaffirming her legacy.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUOTE section (background colour 4) -->
+        <section class="section-quote">
+            <div class="quote-block">
+                <h2 style="color: #e6edf5; border-bottom-color: #6f8aa8;">In her own words</h2>
+                <blockquote>
+                    The Analytical Engine has no pretensions whatever to <em>originate</em> anything. 
+                    It can do whatever we <em>know how to order it</em> to perform. … It might act upon 
+                    other things besides number, were objects found whose mutual fundamental relations 
+                    could be expressed by the abstract science of operations.
+                </blockquote>
+                <div class="quote-author">
+                    Ada Lovelace, from her <em>Notes</em> on the Analytical Engine (1843)
+                </div>
+                <div style="margin-top: 2.2rem; font-size: 0.95rem; opacity: 0.75; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.2rem;">
+                    <span style="font-family: 'Playfair Display', serif; font-style: italic; letter-spacing: 0.3px;">“Ada was the first to envision the computer as a universal machine.”</span>
+                    <span style="display: block; font-size: 0.85rem; margin-top: 0.2rem;">— Babbage scholar, Doron Swade</span>
+                </div>
+                <div class="attribution">
+                    Image: Wikimedia Commons (public domain) · content original &amp; paraphrased from historical sources.
+                </div>
+            </div>
+        </section>
+
+    </div>
+    <!-- end tribute-wrapper -->
+</body>
+</html>
