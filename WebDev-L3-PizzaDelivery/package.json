@@ -1,0 +1,16 @@
+{
+  "name": "forno",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Forno — pizza ordering and kitchen inventory",
+  "scripts": {
+    "dev": "concurrently -n api,web -c red,blue \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "seed": "npm run seed --prefix server",
+    "test": "npm test --prefix server",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse at top, rgba(20, 108, 67, 0.08), transparent 46%),
+      linear-gradient(180deg, rgba(251, 247, 241, 0.7), transparent 180px);
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background: #f0c3cb;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 bg-ember px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ember-deep disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 border border-ink/15 bg-transparent px-4 py-2.5 text-sm text-ink transition-colors hover:border-ink/40 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .input {
+    @apply w-full border border-ink/15 bg-white px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-ink/30 focus:border-ember;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[11px] uppercase tracking-[0.16em] text-ink/55;
+  }
+}
+
+@keyframes emberpulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.pulse-ember {
+  animation: emberpulse 1.6s ease-in-out infinite;
+}
