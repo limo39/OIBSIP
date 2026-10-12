@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calculator · vanilla</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #1e2b3c 0%, #0f1722 100%);
+            padding: 1rem;
+        }
+
+        .calculator {
+            max-width: 400px;
+            width: 100%;
+            background: #1f2a3a;
+            border-radius: 2.5rem;
+            padding: 1.8rem 1.5rem 2rem;
+            box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.03);
+            backdrop-filter: blur(2px);
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        /* --- display --- */
+        .display {
+            background: #0b121b;
+            border-radius: 1.8rem;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: inset 0 6px 10px rgba(0,0,0,0.6), 0 0 0 1px #2b3a4e;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        .display .expression {
+            font-size: 1.2rem;
+            color: #889bb0;
+            min-height: 1.8rem;
+            letter-spacing: 0.3px;
+            width: 100%;
+            text-align: right;
+            transition: 0.1s;
+            font-weight: 350;
+        }
+
+        .display .result {
+            font-size: 2.8rem;
+            font-weight: 500;
+            color: #edf4ff;
+            line-height: 1.2;
+            width: 100%;
+            text-align: right;
+            letter-spacing: -0.5px;
+            transition: 0.1s;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.3);
+            word-break: break-all;
+        }
+
+        .display .result.error {
+            color: #f7a1a1;
+            font-size: 1.6rem;
+            font-weight: 400;
+        }
+
+        /* --- grid buttons --- */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .btn {
+            background: #2a384b;
+            border: none;
+            border-radius: 1.6rem;
+            padding: 1rem 0.2rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #e4eef9;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #10161f, 0 6px 12px rgba(0,0,0,0.3);
+            transition: all 0.07s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+            border: 1px solid #3d4e63;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #10161f;
+        }
+
+        .btn-operator {
+            background: #3d5a7a;
+            border-color: #5a7a9b;
+            color: white;
+            box-shadow: 0 4px 0 #1e2e41;
+        }
+
+        .btn-operator:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #1e2e41;
+        }
+
+        .btn-function {
+            background: #3b3f4b;
+            border-color: #555e6b;
+            color: #d6e2f0;
+            box-shadow: 0 4px 0 #1f232b;
+        }
+
+        .btn-equals {
+            background: #2d7a5c;
+            border-color: #3f9c7a;
+            box-shadow: 0 4px 0 #194435;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .btn-equals:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #194435;
+        }
+
+        .btn-zero {
+            grid-column: span 2;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid #9bb8d9;
+            outline-offset: 2px;
+        }
+
+        /* responsive */
+        @media (max-width: 460px) {
+            .calculator {
+                padding: 1.2rem 1rem 1.5rem;
+                border-radius: 2rem;
+            }
+            .btn {
+                font-size: 1.3rem;
+                padding: 0.9rem 0.1rem;
+                border-radius: 1.3rem;
+            }
+            .display .result {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .btn {
+                font-size: 1.1rem;
+                padding: 0.7rem 0.1rem;
+            }
+            .display .result {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator" role="application" aria-label="Calculator">
+
+        <!-- display -->
+        <div class="display">
+            <div class="expression" id="expressionDisplay"></div>
+            <div class="result" id="resultDisplay">0</div>
+        </div>
+
+        <!-- button grid -->
+        <div class="buttons" id="buttonGrid">
+            <!-- row 1 -->
+            <button class="btn btn-function" data-value="clear">C</button>
+            <button class="btn btn-function" data-value="backspace">⌫</button>
+            <button class="btn btn-operator" data-value="%">%</button>
+            <button class="btn btn-operator" data-value="/">÷</button>
+
+            <!-- row 2 -->
+            <button class="btn" data-value="7">7</button>
+            <button class="btn" data-value="8">8</button>
+            <button class="btn" data-value="9">9</button>
+            <button class="btn btn-operator" data-value="*">×</button>
+
+            <!-- row 3 -->
+            <button class="btn" data-value="4">4</button>
+            <button class="btn" data-value="5">5</button>
+            <button class="btn" data-value="6">6</button>
+            <button class="btn btn-operator" data-value="-">−</button>
+
+            <!-- row 4 -->
+            <button class="btn" data-value="1">1</button>
+            <button class="btn" data-value="2">2</button>
+            <button class="btn" data-value="3">3</button>
+            <button class="btn btn-operator" data-value="+">+</button>
+
+            <!-- row 5 -->
+            <button class="btn btn-zero" data-value="0">0</button>
+            <button class="btn" data-value=".">.</button>
+            <button class="btn btn-equals" data-value="=">=</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // --- DOM refs ---
+            const resultDisplay = document.getElementById('resultDisplay');
+            const expressionDisplay = document.getElementById('expressionDisplay');
+
+            // --- state ---
+            let currentInput = '0';          // what's shown on screen (result)
+            let previousInput = '';          // stored left operand
+            let operator = '';               // current operator (+, -, *, /, %)
+            let shouldResetDisplay = false;  // flag to reset display after operator or equals
+            let justEvaluated = false;       // to manage chaining / repeated equals
+            let lastOperator = '';           // for chaining after evaluation
+
+            // --- helper: update UI ---
+            function updateDisplay() {
+                // if currentInput is very long,   cap but still show
+                let displayValue = currentInput;
+                if (displayValue.length > 16 && !displayValue.includes('e')) {
+                    // if it's a number, try to format with toPrecision, but   keep as string
+                    //   just show as is, but avoid crashing layout.
+                }
+                resultDisplay.textContent = displayValue;
+                // remove error class if present
+                resultDisplay.classList.remove('error');
+            }
+
+            function updateExpression(expressionText) {
+                expressionDisplay.textContent = expressionText;
+            }
+
+            // --- core logic ---
+            function inputDigit(digit) {
+                if (shouldResetDisplay) {
+                    currentInput = '0';
+                    shouldResetDisplay = false;
+                }
+                // prevent multiple leading zeros
+                if (currentInput === '0' && digit !== '.') {
+                    currentInput = digit;
+                } else {
+                    // limit length to avoid overflow (optional)
+                    if (currentInput.replace('-', '').replace('.', '').length >= 15) return;
+                    currentInput += digit;
+                }
+                updateDisplay();
+                // clear any old expression if   are typing new number
+                if (!operator && !previousInput) {
+                    updateExpression('');
+                }
+                justEvaluated = false;
+            }
+
+            function inputDecimal() {
+                if (shouldResetDisplay) {
+                    currentInput = '0';
+                    shouldResetDisplay = false;
+                }
+                if (!currentInput.includes('.')) {
+                    currentInput += '.';
+                }
+                updateDisplay();
+                justEvaluated = false;
+            }
+
+            function handleOperator(op) {
+                // if there's already an operator and   are not resetting, 
+                // chain the previous operation before setting new operator
+                if (operator && !shouldResetDisplay && !justEvaluated) {
+                    // perform the previous operation before chaining
+                    const result = compute(parseFloat(previousInput), parseFloat(currentInput), operator);
+                    if (result === 'Error') {
+                        currentInput = 'Error';
+                        updateDisplay();
+                        resultDisplay.classList.add('error');
+                        operator = '';
+                        previousInput = '';
+                        shouldResetDisplay = true;
+                        updateExpression('');
+                        return;
+                    }
+                    currentInput = String(result);
+                    updateDisplay();
+                }
+
+                // store current value as previous, and set operator
+                previousInput = currentInput;
+                operator = op;
+                shouldResetDisplay = true;
+                justEvaluated = false;
+
+                // build expression string
+                let expr = previousInput + ' ' + symbolForOperator(op) + ' ';
+                updateExpression(expr);
+            }
+
+            function symbolForOperator(op) {
+                const map = { '+': '+', '-': '−', '*': '×', '/': '÷', '%': '%' };
+                return map[op] || op;
+            }
+
+            function compute(a, b, op) {
+                if (op === '+') return a + b;
+                if (op === '-') return a - b;
+                if (op === '*') return a * b;
+                if (op === '/') {
+                    if (b === 0) return 0;
+                    return a / b;
+                }
+                if (op === '%') {
+                    return a % b;
+                }
+                return b; // fallback
+            }
+
+            // evaluate the current expression
+            function evaluate() {
+                if (!operator || previousInput === '') {
+                    // if there's no operator, just display current
+                    return;
+                }
+
+                const a = parseFloat(previousInput);
+                const b = parseFloat(currentInput);
+                const result = compute(a, b, operator);
+
+                if (result === 'Error') {
+                    currentInput = 'Error';
+                    updateDisplay();
+                    resultDisplay.classList.add('error');
+                    // clear state
+                    operator = '';
+                    previousInput = '';
+                    shouldResetDisplay = true;
+                    updateExpression('');
+                    return;
+                }
+
+                // build expression for display
+                const expr = previousInput + ' ' + symbolForOperator(operator) + ' ' + currentInput + ' =';
+                updateExpression(expr);
+
+                currentInput = String(result);
+                updateDisplay();
+
+                // store last operator for chaining
+                lastOperator = operator;
+                // after evaluation,   keep operator for chaining but reset flags
+                //   keep previousInput as current result for chaining
+                previousInput = currentInput;   // result becomes left operand for chaining
+                //   keep operator as lastOperator
+                shouldResetDisplay = true;
+                justEvaluated = true;
+                //   keep operator as is for chaining ? but   set operator to '' so   can chain new ops
+                // Actually   want to allow: 5 + 3 = 8, then * 2 = 16
+                //   keep previousInput = 8, operator = '' and then when user clicks *, handleOperator sets operator = * and previousInput = currentInput (which is 8)
+                // need to keep previousInput as result, clear operator so new operator can be set.
+                const oldOperator = operator;
+                operator = '';   // cleared so next operator works
+                // but want to allow chaining there is need to keep previousInput as result.
+                // That is already done.
+                // also want to show expression with result.
+                // expression is already set.
+                // keep shouldResetDisplay = true.
+                // to ensure that after evaluating, if user presses digit, it starts fresh.
+                // good.
+                //   also need to handle repeated equals: 
+                // if user presses = again, should repeat last operation with lastOperator and currentInput (which is result)
+                // handle that in equals logic.
+            }
+
+            // clear everything
+            function clearAll() {
+                currentInput = '0';
+                previousInput = '';
+                operator = '';
+                shouldResetDisplay = false;
+                justEvaluated = false;
+                lastOperator = '';
+                updateDisplay();
+                updateExpression('');
+                resultDisplay.classList.remove('error');
+            }
+
+            // backspace
+            function backspace() {
+                if (shouldResetDisplay) return;
+                if (currentInput.length > 1) {
+                    currentInput = currentInput.slice(0, -1);
+                } else {
+                    currentInput = '0';
+                }
+                updateDisplay();
+                if (currentInput === '0') {
+                    // if backspace to zero,   may want to clear expression? 
+                }
+            }
+
+            // percentage: divide current by 100
+            function percentage() {
+                const num = parseFloat(currentInput);
+                if (isNaN(num)) return;
+                currentInput = String(num / 100);
+                updateDisplay();
+                // show expression
+                const expr = currentInput + ' %';
+                updateExpression(expr);
+                shouldResetDisplay = true;
+            }
+
+            // ---- handle equals (including chaining and repeated equals) ----
+            function handleEquals() {
+                // if there is an operator and previousInput is set, evaluate
+                if (operator && previousInput !== '') {
+                    // evaluate normally
+                    evaluate();
+                    return;
+                }
+
+                // if there is no operator but   have lastOperator and previousInput from previous evaluation
+                // in justEvaluated state,   can repeat last operation
+                if (justEvaluated && lastOperator && previousInput !== '' && currentInput !== '') {
+                    // currentInput is result from previous evaluation, previousInput is also result
+                    // to apply lastOperator to previousInput (which is result) and currentInput? Actually   want to repeat: 
+                    // for example: 5 + 3 = 8, then = => 8 + 3 =11
+                    // store lastOperand separately.
+                    // store lastOperand in a closure variable.
+                    if (lastOperand !== undefined && !isNaN(lastOperand)) {
+                        const a = parseFloat(previousInput);
+                        const b = lastOperand;
+                        const result = compute(a, b, lastOperator);
+                        if (result === 'Error') {
+                            currentInput = 'Error';
+                            updateDisplay();
+                            resultDisplay.classList.add('error');
+                            operator = '';
+                            previousInput = '';
+                            shouldResetDisplay = true;
+                            updateExpression('');
+                            return;
+                        }
+                        const expr = previousInput + ' ' + symbolForOperator(lastOperator) + ' ' + lastOperand + ' =';
+                        updateExpression(expr);
+                        currentInput = String(result);
+                        updateDisplay();
+                        previousInput = currentInput; // result becomes left for next chain
+                        shouldResetDisplay = true;
+                        // keep lastOperator, keep lastOperand
+                        return;
+                    }
+                }
+
+                // if there is no operator and no pending evaluation, just show current
+                // maybe   want to show expression as current
+                if (!operator && previousInput === '') {
+                    // do nothing
+                }
+            }
+
+            // store last operand for repeated equals
+            let lastOperand = undefined;
+
+            // override evaluate to store lastOperand
+            const originalEvaluate = evaluate;
+            evaluate = function() {
+                if (!operator || previousInput === '') return;
+                const a = parseFloat(previousInput);
+                const b = parseFloat(currentInput);
+                const result = compute(a, b, operator);
+
+                if (result === 'Error') {
+                    currentInput = 'Error';
+                    updateDisplay();
+                    resultDisplay.classList.add('error');
+                    operator = '';
+                    previousInput = '';
+                    shouldResetDisplay = true;
+                    updateExpression('');
+                    return;
+                }
+
+                // store lastOperand for repeated equals
+                lastOperand = b;
+
+                const expr = previousInput + ' ' + symbolForOperator(operator) + ' ' + currentInput + ' =';
+                updateExpression(expr);
+
+                currentInput = String(result);
+                updateDisplay();
+
+                lastOperator = operator;
+                previousInput = currentInput;
+                shouldResetDisplay = true;
+                justEvaluated = true;
+                // keep operator as is?   clear it.
+                operator = '';
+            };
+
+            //  button click handler 
+            function handleButtonClick(event) {
+                const button = event.currentTarget;
+                const value = button.dataset.value;
+
+                // ignore if display shows error, but allow clear
+                if (currentInput === 'Error' && value !== 'clear') {
+                    // if error, only clear works
+                    return;
+                }
+
+                switch (value) {
+                    case '0': case '1': case '2': case '3': case '4':
+                    case '5': case '6': case '7': case '8': case '9':
+                        inputDigit(value);
+                        break;
+                    case '.':
+                        inputDecimal();
+                        break;
+                    case '+': case '-': case '*': case '/': case '%':
+                        if (value === '%') {
+                            percentage();
+                        } else {
+                            handleOperator(value);
+                        }
+                        break;
+                    case '=':
+                        handleEquals();
+                        break;
+                    case 'clear':
+                        clearAll();
+                        break;
+                    case 'backspace':
+                        backspace();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            //   event listeners 
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', handleButtonClick);
+            });
+
+            // keyboard support 
+            document.addEventListener('keydown', (e) => {
+                const key = e.key;
+                let targetValue = null;
+                if (key >= '0' && key <= '9') targetValue = key;
+                else if (key === '.') targetValue = '.';
+                else if (key === '+') targetValue = '+';
+                else if (key === '-') targetValue = '-';
+                else if (key === '*') targetValue = '*';
+                else if (key === '/') targetValue = '/';
+                else if (key === '%') targetValue = '%';
+                else if (key === 'Enter' || key === '=') targetValue = '=';
+                else if (key === 'Backspace') targetValue = 'backspace';
+                else if (key === 'c' || key === 'C') targetValue = 'clear';
+                else if (key === 'Escape') targetValue = 'clear';
+
+                if (targetValue) {
+                    e.preventDefault();
+                    // find button with matching data-value
+                    const btn = document.querySelector(`.btn[data-value="${targetValue}"]`);
+                    if (btn) btn.click();
+                }
+            });
+
+            // init display
+            updateDisplay();
+            updateExpression('');
+
+        })();
+    </script>
+</body>
+</html>
